@@ -1,7 +1,7 @@
 import java.util.*;
 
 public class BackwardChaining {
-    private KnowledgeBase kb;
+    private final KnowledgeBase kb;
     private final String query;
     private final Set<String> inferred;
     private final List<String> agenda;
@@ -48,7 +48,7 @@ public class BackwardChaining {
         List<String> result = new ArrayList<>();
 
         while (!agenda.isEmpty()) {
-            String p = agenda.remove(agenda.size() - 1);
+            String p = agenda.removeLast();
             if (!inferred.contains(p)) {
                 inferred.add(p);
                 result.add(p);
