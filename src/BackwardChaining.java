@@ -1,49 +1,71 @@
 import java.util.*;
 
 public class BackwardChaining {
-    // Main method to check if the query can be entailed using the backward chaining method
-    public static List<String> check(KnowledgeBase kb, String query) {
-        Set<String> visited = new LinkedHashSet<>();
-        List<String> result = new ArrayList<>();
-        if (backwardChain(kb, query, visited, result)) {
-            return result;
-        } else {
-            return null;
+    private KnowledgeBase kb;
+    private final String query;
+    private final Set<String> inferred;
+    private final List<String> agenda;
+    private final Map<String, List<String>> clauses;
+
+    public BackwardChaining(KnowledgeBase kb, String query) {
+        this.kb = kb;
+        this.query = query;
+        this.inferred = new LinkedHashSet<>();
+        this.agenda = new ArrayList<>();
+        this.clauses = new HashMap<>();
+        initializeClauses();
+    }
+
+    private void initializeClauses() {
+        for (String clause : kb.getClauses()) {
+            String[] parts = clause.split("=>");
+            if (parts.length == 2) { // Ensure the clause has both a body and a head
+                String head = parts[1].trim();
+                String[] body = parts[0].trim().split("&");
+
+                if (!clauses.containsKey(head)) {
+                    clauses.put(head, new ArrayList<>());
+                }
+                clauses.get(head).addAll(Arrays.asList(body));
+            } else if (parts.length == 1) { // Handle facts without "=>"
+                String fact = parts[0].trim();
+                if (!clauses.containsKey(fact)) {
+                    clauses.put(fact, new ArrayList<>());
+                }
+            } else {
+                System.err.println("Invalid clause format: " + clause);
+            }
         }
     }
 
-    // Recursive method to perform backward chaining
-    private static boolean backwardChain(KnowledgeBase kb, String q, Set<String> visited, List<String> result) {
-        if (visited.contains(q)) {
-            return false;
-        }
-        visited.add(q);
+    public static List<String> check(KnowledgeBase kb, String query) {
+        BackwardChaining bc = new BackwardChaining(kb, query);
+        return bc.infer();
+    }
 
-        for (String clause : kb.getClauses()) {
-            if (!clause.contains("=>")) {
-                if (clause.trim().equals(q)) {
-                    result.add(q);
-                    return true;
-                }
-            } else {
-                String[] parts = clause.split("=>");
-                String[] premises = parts[0].split("&");
-                String conclusion = parts[1].trim();
-                if (conclusion.equals(q)) {
-                    boolean allPremisesTrue = true;
-                    for (String premise : premises) {
-                        if (!backwardChain(kb, premise.trim(), visited, result)) {
-                            allPremisesTrue = false;
-                            break;
+    public List<String> infer() {
+        agenda.add(query);
+        List<String> result = new ArrayList<>();
+
+        while (!agenda.isEmpty()) {
+            String p = agenda.remove(agenda.size() - 1);
+            if (!inferred.contains(p)) {
+                inferred.add(p);
+                result.add(p);
+
+                if (clauses.containsKey(p)) {
+                    for (String premise : clauses.get(p)) {
+                        if (!premise.isEmpty()) {
+                            agenda.add(premise.trim());
                         }
                     }
-                    if (allPremisesTrue) {
-                        result.add(q);
-                        return true;
-                    }
+                } else {
+                    return null;
                 }
             }
         }
-        return false;
+
+        Collections.reverse(result);
+        return result;
     }
 }
