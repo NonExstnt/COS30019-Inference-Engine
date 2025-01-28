@@ -21,7 +21,6 @@ public class ForwardChaining {
             if (clause.contains("=>")) {
                 String[] parts = clause.split("=>");
                 String[] premises = parts[0].split("&");
-                String conclusion = parts[1].trim();
                 count.put(clause, premises.length);
                 for (String premise : premises) {
                     premise = premise.trim();
