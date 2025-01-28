@@ -2,27 +2,28 @@ import java.util.*;
 
 public class TruthTable {
     // Main method to check if the query can be entailed using the truth table method
-    public static boolean check(KnowledgeBase kb, String query) {
+    public static int check(KnowledgeBase kb, String query) {
         List<String> symbols = extractSymbols(kb);
-        return ttCheckAll(kb, query, symbols, new HashMap<>());
+        return ttCheckAll(kb, query, symbols, new HashMap<>(), 0);
     }
 
     // Recursive method to check all possible models
-    private static boolean ttCheckAll(KnowledgeBase kb, String query, List<String> symbols, Map<String, Boolean> model) {
+    private static int ttCheckAll(KnowledgeBase kb, String query, List<String> symbols, Map<String, Boolean> model, int modelCount) {
         if (symbols.isEmpty()) {
             if (plTrue(kb.getClauses(), model)) {
-                return plTrue(Collections.singletonList(query), model);
-            } else {
-                return true;
+                if (plTrue(Collections.singletonList(query), model)) {
+                    return modelCount + 1;
+                }
             }
+            return modelCount;
         } else {
-            String p = symbols.getFirst();
+            String p = symbols.get(0);
             List<String> rest = symbols.subList(1, symbols.size());
             Map<String, Boolean> trueModel = new HashMap<>(model);
             trueModel.put(p, true);
             Map<String, Boolean> falseModel = new HashMap<>(model);
             falseModel.put(p, false);
-            return ttCheckAll(kb, query, rest, trueModel) && ttCheckAll(kb, query, rest, falseModel);
+            return ttCheckAll(kb, query, rest, trueModel, modelCount) + ttCheckAll(kb, query, rest, falseModel, modelCount);
         }
     }
 

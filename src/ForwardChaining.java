@@ -2,10 +2,11 @@ import java.util.*;
 
 public class ForwardChaining {
     // Main method to check if the query can be entailed using the forward chaining method
-    public static boolean check(KnowledgeBase kb, String query) {
+    public static List<String> check(KnowledgeBase kb, String query) {
         Set<String> inferred = new HashSet<>();
         Queue<String> agenda = new LinkedList<>();
         Map<String, Integer> count = new HashMap<>();
+        List<String> entailed = new ArrayList<>();
 
         // Initialize agenda and count
         for (String clause : kb.getClauses()) {
@@ -28,10 +29,12 @@ public class ForwardChaining {
         while (!agenda.isEmpty()) {
             String p = agenda.poll();
             if (p.equals(query)) {
-                return true;
+                entailed.add(p);
+                return entailed;
             }
             if (!inferred.contains(p)) {
                 inferred.add(p);
+                entailed.add(p);
                 for (String clause : kb.getClauses()) {
                     String[] parts = clause.split("=>");
                     if (parts.length == 2) {
@@ -54,6 +57,6 @@ public class ForwardChaining {
                 }
             }
         }
-        return false;
+        return null;
     }
 }

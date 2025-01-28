@@ -1,34 +1,37 @@
+import java.util.*;
+
 public class InferenceEngine {
     public static void main(String[] args) {
-        if (args.length != 3) {
-            System.out.println("Usage: iengine <method> <filename>");
-            return;
-        }
 
         String method = args[0];
         String filename = args[1];
+
+        if (method.isEmpty() || filename.isEmpty()) {
+            System.out.println("Usage: iengine <method> <filename>");
+            return;
+        }
 
         KnowledgeBase kb = new KnowledgeBase();
         kb.loadFromFile(filename);
 
         String query = kb.getQuery();
 
-        boolean result = false;
         switch (method) {
             case "TT":
-                result = TruthTable.check(kb, query);
+                int modelCount = TruthTable.check(kb, query);
+                System.out.println(modelCount > 0 ? "YES: " + modelCount : "NO");
                 break;
             case "FC":
-                result = ForwardChaining.check(kb, query);
+                List<String> fcResult = ForwardChaining.check(kb, query);
+                System.out.println(fcResult != null ? "YES: " + String.join(", ", fcResult) : "NO");
                 break;
             case "BC":
-                result = BackwardChaining.check(kb, query);
+                List<String> bcResult = BackwardChaining.check(kb, query);
+                System.out.println(bcResult != null ? "YES: " + String.join(", ", bcResult) : "NO");
                 break;
             default:
                 System.out.println("Unknown method: " + method);
-                return;
+                break;
         }
-
-        System.out.println(result ? "YES" : "NO");
     }
 }
