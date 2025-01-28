@@ -17,7 +17,7 @@ public class TruthTable {
             }
             return modelCount;
         } else {
-            String p = symbols.get(0);
+            String p = symbols.getFirst();
             List<String> rest = symbols.subList(1, symbols.size());
             Map<String, Boolean> trueModel = new HashMap<>(model);
             trueModel.put(p, true);

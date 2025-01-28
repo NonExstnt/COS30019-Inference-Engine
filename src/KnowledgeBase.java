@@ -2,7 +2,7 @@ import java.io.*;
 import java.util.*;
 
 public class KnowledgeBase {
-    private List<String> clauses;
+    private final List<String> clauses;
     private String query;
 
     public KnowledgeBase() {
