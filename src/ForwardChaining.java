@@ -14,12 +14,6 @@ public class ForwardChaining {
             if (parts.length == 2) {
                 String[] premises = parts[0].split("&");
                 count.put(clause, premises.length);
-                for (String premise : premises) {
-                    premise = premise.trim();
-                    if (!agenda.contains(premise)) {
-                        agenda.add(premise);
-                    }
-                }
             } else {
                 agenda.add(parts[0].trim());
             }
