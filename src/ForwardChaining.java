@@ -39,18 +39,13 @@ public class ForwardChaining {
                     String[] parts = clause.split("=>");
                     if (parts.length == 2) {
                         String[] premises = parts[0].split("&");
-                        boolean allPremisesTrue = true;
-                        for (String premise : premises) {
-                            premise = premise.trim();
-                            if (!inferred.contains(premise)) {
-                                allPremisesTrue = false;
-                                break;
-                            }
-                        }
-                        if (allPremisesTrue) {
-                            String conclusion = parts[1].trim();
-                            if (!agenda.contains(conclusion)) {
-                                agenda.add(conclusion);
+                        if (Arrays.asList(premises).contains(p)) {
+                            count.put(clause, count.get(clause) - 1);
+                            if (count.get(clause) == 0) {
+                                String conclusion = parts[1].trim();
+                                if (!agenda.contains(conclusion)) {
+                                    agenda.add(conclusion);
+                                }
                             }
                         }
                     }
